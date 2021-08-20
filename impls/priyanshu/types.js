@@ -100,13 +100,13 @@ class Identifier extends MalValue {
 }
 
 class MalSymbol extends MalValue {
-  constructor(malSymbol) {
+  constructor(symbol) {
     super();
-    this.malSymbol = malSymbol;
+    this.symbol = symbol;
   }
 
   pr_str() {
-    return this.malSymbol;
+    return this.symbol;
   }
 }
 
