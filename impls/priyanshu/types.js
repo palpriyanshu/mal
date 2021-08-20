@@ -44,7 +44,7 @@ class HashMap extends MalValue {
     let string = '';
     let separator = '';
     for (const [key, value] of this.hashMap.entries()) {
-      string = string + separator + pr_str(key[0]) + ' ' + pr_str(value);
+      string = string + separator + pr_str(key[0] || key) + ' ' + pr_str(value);
       separator = ' ';
     }
     return '{' + string + '}';

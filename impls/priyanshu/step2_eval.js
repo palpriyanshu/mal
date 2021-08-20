@@ -36,6 +36,15 @@ const eval_ast = (ast, repl_env) => {
     return new Vector(evaluatedList);
   }
 
+  if (ast instanceof HashMap) {
+    const evaluatedHashMap = new Map();
+    for (const [key, value] of ast.hashMap.entries()) {
+      const evaluatedValue = EVAL(value, repl_env);
+      evaluatedHashMap.set(key[0], evaluatedValue);
+    }
+    return new HashMap(evaluatedHashMap);
+  }
+
   return ast;
 };
 
