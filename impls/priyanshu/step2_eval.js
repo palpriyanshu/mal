@@ -10,11 +10,12 @@ const rl = readline.createInterface({
 });
 
 const repl_env = {
-  '+': (a, b) => a + b,
+  '+': (...args) => args.reduce((a, b) => a + b, 0),
+  '*': (...args) => args.reduce((a, b) => a * b, 1),
   '-': (a, b) => a - b,
-  '*': (a, b) => a * b,
   '/': (a, b) => a / b,
   pi: Math.PI,
+  'empty?': (x) => x.isEmpty(),
 };
 
 const eval_ast = (ast, repl_env) => {
@@ -55,7 +56,7 @@ const EVAL = (ast, repl_env) => {
     return eval_ast(ast, repl_env);
   }
 
-  if (ast.ast.length === 0) {
+  if (ast.isEmpty()) {
     return ast;
   }
 

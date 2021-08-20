@@ -21,12 +21,20 @@ class List extends MalValue {
   pr_str() {
     return '(' + this.ast.map(pr_str).join(' ') + ')';
   }
+
+  isEmpty() {
+    return this.ast.length === 0;
+  }
 }
 
 class Vector extends MalValue {
   constructor(ast) {
     super();
     this.ast = ast;
+  }
+
+  isEmpty() {
+    return this.ast.length === 0;
   }
 
   pr_str() {
