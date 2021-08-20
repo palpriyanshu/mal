@@ -6,6 +6,7 @@ const {
   Keyword,
   MalSymbol,
   Identifier,
+  Comment,
   Nil,
 } = require('./types');
 
@@ -84,7 +85,7 @@ const read_hashmap = (reader) => {
 };
 
 const read_atom = (reader) => {
-  const token = reader.next();
+  let token = reader.next();
 
   if (isInteger(token)) {
     return parseInt(token);
@@ -111,7 +112,12 @@ const read_atom = (reader) => {
   }
 
   if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
-    return new Str(token.slice(1, -1));
+    const string = token
+      .slice(1, -1)
+      .replace('/\\n/g', '\n')
+      .replace('\\"/g', '"')
+      .replace('/\\\\/g', '\\');
+    return new Str(string);
   }
 
   if (token.startsWith('"')) {

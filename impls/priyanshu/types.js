@@ -55,7 +55,12 @@ class Str extends MalValue {
   }
 
   pr_str() {
-    return '"' + this.string + '"';
+    console.log(this.string);
+    const string = this.string
+      .replace('/\n/g', '\\n')
+      .replace('/"/g', '\\"')
+      .replace('/\\/g', '\\\\');
+    return '"' + string + '"';
   }
 }
 
@@ -67,6 +72,17 @@ class Keyword extends MalValue {
 
   pr_str() {
     return ':' + this.keyword;
+  }
+}
+
+class Comment extends MalValue {
+  constructor(comment) {
+    super();
+    this.comment = comment;
+  }
+
+  pr_str() {
+    return '';
   }
 }
 
@@ -113,6 +129,7 @@ module.exports = {
   Keyword,
   MalSymbol,
   Identifier,
+  Comment,
   Nil,
   pr_str,
 };
