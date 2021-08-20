@@ -35,16 +35,19 @@ class Vector extends MalValue {
 }
 
 class HashMap extends MalValue {
-  constructor(ast) {
+  constructor(hashMap) {
     super();
-    this.ast = ast;
+    this.hashMap = hashMap;
   }
 
   pr_str() {
-    const keyValuePairs = Object.keys(this.ast).map((x) => {
-      return ' ' + pr_str(x) + ' ' + pr_str(this.ast[x]);
-    });
-    return '{' + keyValuePairs.toString().trim() + '}';
+    let string = '';
+    let separator = '';
+    for (const [key, value] of this.hashMap.entries()) {
+      string = string + separator + pr_str(key[0]) + ' ' + pr_str(value);
+      separator = ' ';
+    }
+    return '{' + string + '}';
   }
 }
 
@@ -55,7 +58,6 @@ class Str extends MalValue {
   }
 
   pr_str() {
-    console.log(this.string);
     const string = this.string
       .replace('/\n/g', '\\n')
       .replace('/"/g', '\\"')

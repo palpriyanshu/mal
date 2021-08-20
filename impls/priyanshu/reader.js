@@ -65,23 +65,22 @@ const read_vector = (reader) => {
 };
 
 const read_hashmap = (reader) => {
-  const ast = {};
-  let isKey = true;
-  const keys = [];
-  reader.next();
-  while (reader.peek() !== '}') {
-    if (reader.peek() === undefined) {
-      throw 'unbalanced';
-    }
-    if (isKey) {
-      lastKey = read_form(reader);
+  const ast = read_seq(reader, '}');
+  let hashMap = new Map();
+  for (let i = 0; i < ast.length; i += 2) {
+    if (
+      !(
+        ast[i] instanceof Str ||
+        ast[i] instanceof MalSymbol ||
+        ast[i] instanceof Keyword
+      )
+    ) {
+      throw 'HashMap is not supported';
     } else {
-      ast[lastKey] = read_form(reader);
+      hashMap.set([ast[i]], ast[i + 1]);
     }
-    isKey = !isKey;
   }
-  reader.next();
-  return new HashMap(ast);
+  return new HashMap(hashMap);
 };
 
 const read_atom = (reader) => {
