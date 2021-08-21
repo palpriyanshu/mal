@@ -9,6 +9,10 @@ const pr_str = (val) => {
     return val.pr_str();
   }
 
+  if (val instanceof Function) {
+    return '#<function>';
+  }
+
   return val.toString();
 };
 
