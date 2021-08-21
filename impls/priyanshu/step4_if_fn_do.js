@@ -28,6 +28,9 @@ repl_env.set(new MalSymbol('/'), (...args) => {
 
 repl_env.set(new MalSymbol('pi'), Math.PI);
 repl_env.set(new MalSymbol('empty?'), (x) => x.isEmpty());
+repl_env.set(new MalSymbol('='), (x, y) => x === y);
+repl_env.set(new MalSymbol('>'), (x, y) => x > y);
+repl_env.set(new MalSymbol('<'), (x, y) => x < y);
 
 const eval_ast = (ast, repl_env) => {
   if (ast instanceof MalSymbol) {
@@ -101,11 +104,10 @@ const EVAL = (ast, repl_env) => {
   }
 
   if (firstElement === 'fn*') {
-    const exprs = EVAL(ast.ast[1], repl_env);
-    if (exprs === Nil || exprs === false) {
-      return EVAL(ast.ast[3], repl_env);
-    }
-    return EVAL(ast.ast[2], repl_env);
+    return function (...exprs) {
+      const newEnv = Env.createEnv(repl_env, ast.ast[1].ast, exprs);
+      return EVAL(ast.ast[2], newEnv);
+    };
   }
 
   const [fn, ...args] = eval_ast(ast, repl_env).ast;
@@ -119,6 +121,9 @@ const EVAL = (ast, repl_env) => {
 const PRINT = (val) => pr_str(val);
 
 const rep = (str) => PRINT(EVAL(READ(str), repl_env));
+
+rep('(def! not (fn* [x] (if x false true)))');
+rep('(def! sqr (fn* [x] (* x x)))');
 
 const main = () => {
   rl.question('user> ', (str) => {
