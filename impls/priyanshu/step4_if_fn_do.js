@@ -4,33 +4,12 @@ const {read_str} = require('./reader');
 const {pr_str} = require('./printer');
 const {List, MalSymbol, Vector, HashMap, Nil} = require('./types');
 const {Env} = require('./env');
+const {repl_env} = require('./core');
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-
-const repl_env = new Env();
-repl_env.set(new MalSymbol('+'), (...args) => args.reduce((a, b) => a + b, 0));
-repl_env.set(new MalSymbol('*'), (...args) => args.reduce((a, b) => a * b, 1));
-repl_env.set(new MalSymbol('-'), (...args) => {
-  if (args.length === 1) {
-    args.unshift(0);
-  }
-  return args.reduce((a, b) => a - b);
-});
-repl_env.set(new MalSymbol('/'), (...args) => {
-  if (args.length === 1) {
-    args.unshift(1);
-  }
-  return args.reduce((a, b) => a / b);
-});
-
-repl_env.set(new MalSymbol('pi'), Math.PI);
-repl_env.set(new MalSymbol('empty?'), (x) => x.isEmpty());
-repl_env.set(new MalSymbol('='), (x, y) => x === y);
-repl_env.set(new MalSymbol('>'), (x, y) => x > y);
-repl_env.set(new MalSymbol('<'), (x, y) => x < y);
 
 const eval_ast = (ast, repl_env) => {
   if (ast instanceof MalSymbol) {
@@ -98,7 +77,7 @@ const EVAL = (ast, repl_env) => {
   if (firstElement === 'if') {
     const exprs = EVAL(ast.ast[1], repl_env);
     if (exprs === Nil || exprs === false) {
-      return EVAL(ast.ast[3], repl_env);
+      return ast.ast[3] !== undefined ? EVAL(ast.ast[3], repl_env) : Nil;
     }
     return EVAL(ast.ast[2], repl_env);
   }
@@ -118,7 +97,7 @@ const EVAL = (ast, repl_env) => {
   throw `${fn} is not a function`;
 };
 
-const PRINT = (val) => pr_str(val);
+const PRINT = (val) => pr_str(val, true);
 
 const rep = (str) => PRINT(EVAL(READ(str), repl_env));
 
