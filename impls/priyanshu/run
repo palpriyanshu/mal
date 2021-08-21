@@ -1,2 +1,2 @@
 #!/bin/bash
-exec node $(dirname $0)/${STEP:-step2_eval}.js "${@}"
+exec node $(dirname $0)/${STEP:-step3_env}.js "${@}"
