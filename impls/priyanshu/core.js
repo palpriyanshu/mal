@@ -1,4 +1,4 @@
-const {List, MalSymbol, Vector, HashMap, Nil} = require('./types');
+const {List, MalSymbol, Vector, HashMap, Nil, MalValue} = require('./types');
 const {Env} = require('./env');
 const {pr_str} = require('./printer');
 
@@ -30,6 +30,16 @@ repl_env.set(new MalSymbol('prn'), (val) => {
   const str = pr_str(val, true);
   console.log(str);
   return Nil;
+});
+
+repl_env.set(new MalSymbol('println'), (...val) => {
+  const str = val.map((x) => pr_str(x, false)).join(' ');
+  console.log('' + str + '\n');
+  return Nil;
+});
+
+repl_env.set(new MalSymbol('str'), (...val) => {
+  return val.map((x) => pr_str(x, true)).join('');
 });
 
 repl_env.set(new MalSymbol('list'), (...args) => new List([...args]));
