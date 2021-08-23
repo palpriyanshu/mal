@@ -1,2 +1,2 @@
 #!/bin/bash
-exec node $(dirname $0)/${STEP:-step4_if_fn_do}.js "${@}"
+exec node $(dirname $0)/${STEP:-step5_tco}.js "${@}"

@@ -64,7 +64,7 @@ class HashMap extends MalValue {
     let string = '';
     let separator = '';
     for (const [key, value] of this.hashMap.entries()) {
-      string = string + separator + pr_str(key[0] || key) + ' ' + pr_str(value);
+      string = string + separator + pr_str(key[0] || key, print_readably) + ' ' + pr_str(value, print_readably);
       separator = ' ';
     }
     return '{' + string + '}';
@@ -134,6 +134,19 @@ class MalSymbol extends MalValue {
   }
 }
 
+class FN extends MalValue{
+  constructor(binds, fnBody, env){
+    super();
+    this.binds = binds;
+    this.fnBody = fnBody;
+    this.env = env;
+  }
+
+  pr_str(print_readably = false) {
+    return '#<function>';
+  }
+}
+
 class NilValue extends MalValue {
   constructor() {
     super();
@@ -156,6 +169,7 @@ module.exports = {
   MalSymbol,
   Identifier,
   Comment,
+  FN,
   Nil,
   pr_str,
 };
