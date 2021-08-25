@@ -6,7 +6,7 @@ class MalValue {
 
 const pr_str = (val, print_readably = false) => {
   if (val instanceof MalValue) {
-    return val.pr_str();
+    return val.pr_str(print_readably);
   }
 
   if (val instanceof Function) {
@@ -147,6 +147,26 @@ class FN extends MalValue{
   }
 }
 
+class Atom extends MalValue{
+  constructor(malValue){
+    super();
+    this.malValue = malValue;
+  }
+
+  pr_str(print_readably = false) {
+    return '#<function>';
+  }
+
+  getValue(){
+    return this.malValue;
+  }
+
+  setRef(value){
+    this.malValue = value;
+    return value;
+  }
+}
+
 class NilValue extends MalValue {
   constructor() {
     super();
@@ -171,5 +191,6 @@ module.exports = {
   Comment,
   FN,
   Nil,
+  Atom,
   pr_str,
 };
