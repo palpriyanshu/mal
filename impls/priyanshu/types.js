@@ -23,7 +23,7 @@ class List extends MalValue {
   }
 
   pr_str(print_readably = false) {
-    return '(' + this.ast.map(pr_str).join(' ') + ')';
+    return '(' + this.ast.map((e) => pr_str(e, print_readably)).join(' ') + ')';
   }
 
   isEmpty() {
@@ -46,7 +46,7 @@ class Vector extends MalValue {
   }
 
   pr_str(print_readably = false) {
-    return '[' + this.ast.map(pr_str).join(' ') + ']';
+    return '[' + this.ast.map((e) => pr_str(e, print_readably)).join(' ') + ']';
   }
 
   count() {
@@ -64,7 +64,12 @@ class HashMap extends MalValue {
     let string = '';
     let separator = '';
     for (const [key, value] of this.hashMap.entries()) {
-      string = string + separator + pr_str(key[0] || key, print_readably) + ' ' + pr_str(value, print_readably);
+      string =
+        string +
+        separator +
+        pr_str(key, print_readably) +
+        ' ' +
+        pr_str(value, print_readably);
       separator = ' ';
     }
     return '{' + string + '}';
@@ -80,13 +85,13 @@ class Str extends MalValue {
   pr_str(print_readably = false) {
     if (print_readably) {
       const string = this.string
-        .replace('/\n/g', '\\n')
-        .replace('/"/g', '\\"')
-        .replace('/\\/g', '\\\\');
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n');
       return '"' + string + '"';
     }
 
-    return '"' + this.string + '"';
+    return this.string;
   }
 }
 
@@ -134,8 +139,8 @@ class MalSymbol extends MalValue {
   }
 }
 
-class FN extends MalValue{
-  constructor(binds, fnBody, env){
+class FN extends MalValue {
+  constructor(binds, fnBody, env, fn) {
     super();
     this.binds = binds;
     this.fnBody = fnBody;
@@ -147,21 +152,21 @@ class FN extends MalValue{
   }
 }
 
-class Atom extends MalValue{
-  constructor(malValue){
+class Atom extends MalValue {
+  constructor(malValue) {
     super();
     this.malValue = malValue;
   }
 
   pr_str(print_readably = false) {
-    return '#<function>';
+    return `(atom ${this.malValue})`;
   }
 
-  getValue(){
+  getValue() {
     return this.malValue;
   }
 
-  setRef(value){
+  setRef(value) {
     this.malValue = value;
     return value;
   }

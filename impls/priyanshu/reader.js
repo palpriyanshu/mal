@@ -113,9 +113,9 @@ const read_atom = (reader) => {
   if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
     const string = token
       .slice(1, -1)
-      .replace('/\\n/g', '\n')
-      .replace('\\"/g', '"')
-      .replace('/\\\\/g', '\\');
+      .replace(/\\n/g, '\n')
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, '\\');
     return new Str(string);
   }
 
@@ -129,14 +129,25 @@ const read_atom = (reader) => {
 const tokenize = (str) => {
   const regex =
     /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
+  let matchedValue = regex.exec(str);
+  const tokens = [];
+  while (matchedValue[1]) {
+    if (matchedValue[1][0] !== ';') {
+      tokens.push(matchedValue[1]);
+    }
+    matchedValue = regex.exec(str);
+  }
 
-  return [...str.matchAll(regex)].map((element) => element[1]).slice(0, -1);
+  return tokens;
 };
 
 const read_form = (reader) => {
   const token = reader.peek();
 
   switch (token[0]) {
+    case '@':
+      reader.next();
+      return new List([new MalSymbol('deref'), new MalSymbol(reader.next())]);
     case '(':
       return read_list(reader);
     case '[':
