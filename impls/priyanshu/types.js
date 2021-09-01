@@ -145,10 +145,15 @@ class FN extends MalValue {
     this.binds = binds;
     this.fnBody = fnBody;
     this.env = env;
+    this.fn = fn;
   }
 
   pr_str(print_readably = false) {
     return '#<function>';
+  }
+
+  apply(args) {
+    return this.fn.apply(null, args);
   }
 }
 
@@ -169,6 +174,17 @@ class Atom extends MalValue {
   setRef(value) {
     this.malValue = value;
     return value;
+  }
+
+  swap(fn, args) {
+    let newValue;
+    if (fn instanceof FN) {
+      newValue = fn.apply([this.malValue, ...args]);
+    } else {
+      newValue = fn(this.malValue, ...args);
+    }
+
+    return this.setRef(newValue);
   }
 }
 

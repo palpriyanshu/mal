@@ -7,6 +7,7 @@ const {
   MalValue,
   Str,
   Atom,
+  FN,
 } = require('./types');
 const {Env} = require('./env');
 const {pr_str} = require('./printer');
@@ -67,6 +68,10 @@ repl_env.set(new MalSymbol('atom?'), (arg) => arg instanceof Atom);
 repl_env.set(new MalSymbol('deref'), (atom) => atom.getValue());
 repl_env.set(new MalSymbol('reset!'), (atom, malValue) =>
   atom.setRef(malValue)
+);
+
+repl_env.set(new MalSymbol('swap!'), (atom, fn, ...fnArgs) =>
+  atom.swap(fn, fnArgs)
 );
 
 repl_env.set(

@@ -11,7 +11,6 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-
 const eval_ast = (ast, repl_env) => {
   if (ast instanceof MalSymbol) {
     return repl_env.get(ast);
@@ -119,16 +118,6 @@ const EVAL = (ast, repl_env) => {
 };
 
 repl_env.set(new MalSymbol('eval'), (ast) => EVAL(ast, repl_env));
-repl_env.set(new MalSymbol('swap!'), (atom, fn, ...fnArgs) => {
-  return EVAL(
-    new List([
-      new MalSymbol('reset!'),
-      atom,
-      new List([fn, atom.malValue, ...fnArgs]),
-    ]),
-    repl_env
-  );
-});
 
 const PRINT = (val) => pr_str(val, true);
 
