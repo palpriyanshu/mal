@@ -32,7 +32,12 @@ repl_env.set(new MalSymbol('/'), (...args) => {
 
 repl_env.set(new MalSymbol('pi'), Math.PI);
 repl_env.set(new MalSymbol('empty?'), (x) => x.isEmpty());
-repl_env.set(new MalSymbol('='), (x, y) => x == y);
+repl_env.set(new MalSymbol('='), (x, y) => {
+  if (x instanceof MalValue && y instanceof MalValue) {
+    return x.equal(y);
+  }
+  return x === y;
+});
 repl_env.set(new MalSymbol('>'), (x, y) => x > y);
 repl_env.set(new MalSymbol('<'), (x, y) => x < y);
 repl_env.set(new MalSymbol('<='), (x, y) => x <= y);

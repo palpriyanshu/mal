@@ -16,7 +16,33 @@ const pr_str = (val, print_readably = false) => {
   return val.toString();
 };
 
-class List extends MalValue {
+class Sequence extends MalValue {
+  constructor(ast) {
+    super();
+    this.ast = ast;
+  }
+
+  equal(other) {
+    if (!(other instanceof Sequence)) {
+      return false;
+    }
+
+    other.ast.forEach((ele, index) => {
+      if (element instanceof MalValue) {
+        return element.equal(this.ast[index]);
+      }
+      return ele === this.ast[index];
+    });
+
+    if (this.ast.length === 0 && other.ast.length === 0) {
+      return true;
+    }
+
+    return false;
+  }
+}
+
+class List extends Sequence {
   constructor(ast) {
     super();
     this.ast = ast;
@@ -44,7 +70,7 @@ class List extends MalValue {
   }
 }
 
-class Vector extends MalValue {
+class Vector extends Sequence {
   constructor(ast) {
     super();
     this.ast = ast;
@@ -92,6 +118,14 @@ class HashMap extends MalValue {
     }
     return '{' + string + '}';
   }
+
+  equal(other) {
+    if (!(other instanceof HashMap)) {
+      return false;
+    }
+
+    return this.hashMap === other.hashMap;
+  }
 }
 
 class Str extends MalValue {
@@ -111,6 +145,13 @@ class Str extends MalValue {
 
     return this.string;
   }
+
+  equal(other) {
+    if (!(other instanceof Str)) {
+      return false;
+    }
+    return this.string === other.string;
+  }
 }
 
 class Keyword extends MalValue {
@@ -121,6 +162,14 @@ class Keyword extends MalValue {
 
   pr_str(print_readably = false) {
     return ':' + this.keyword;
+  }
+
+  equal(other) {
+    if (!(other instanceof Keyword)) {
+      return false;
+    }
+
+    return this.keyword === other.keyword;
   }
 }
 
@@ -133,6 +182,13 @@ class Comment extends MalValue {
   pr_str(print_readably = false) {
     return '';
   }
+
+  equal(other) {
+    if (!(other instanceof Comment)) {
+      return false;
+    }
+    return this.comment === other.comment;
+  }
 }
 
 class Identifier extends MalValue {
@@ -144,6 +200,13 @@ class Identifier extends MalValue {
   pr_str(print_readably = false) {
     return this.identifier;
   }
+
+  equal(other) {
+    if (!(other instanceof Identifier)) {
+      return false;
+    }
+    return this.identifier === other.identifier;
+  }
 }
 
 class MalSymbol extends MalValue {
@@ -154,6 +217,14 @@ class MalSymbol extends MalValue {
 
   pr_str(print_readably = false) {
     return this.symbol;
+  }
+
+  equal(other) {
+    if (!(other instanceof MalSymbol)) {
+      return false;
+    }
+
+    return this.symbol === other.symbol;
   }
 }
 
@@ -172,6 +243,13 @@ class FN extends MalValue {
 
   apply(args) {
     return this.fn.apply(null, args);
+  }
+
+  equal(other) {
+    if (!(other instanceof Function)) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -204,6 +282,18 @@ class Atom extends MalValue {
 
     return this.setRef(newValue);
   }
+
+  equal(other) {
+    if (!(other instanceof Atom)) {
+      return false;
+    }
+
+    if (other.malValue instanceof MalValue) {
+      return other.malValue.equal(this.malValue);
+    }
+
+    return other.malValue === this.malValue;
+  }
 }
 
 class NilValue extends MalValue {
@@ -213,6 +303,13 @@ class NilValue extends MalValue {
 
   pr_str(print_readably = false) {
     return 'nil';
+  }
+
+  equal(other) {
+    if (!(other instanceof Sequence)) {
+      return false;
+    }
+    return false;
   }
 }
 
