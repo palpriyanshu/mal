@@ -141,13 +141,23 @@ const tokenize = (str) => {
   return tokens;
 };
 
+const read_macro = (reader, macro_name) => {
+  reader.next();
+  return new List([new MalSymbol(macro_name), new MalSymbol(reader.next())]);
+};
+
 const read_form = (reader) => {
   const token = reader.peek();
 
   switch (token[0]) {
-    case '@':
-      reader.next();
-      return new List([new MalSymbol('deref'), new MalSymbol(reader.next())]);
+    case "'":
+      return read_macro(reader, 'quote');
+    case '`':
+      return read_macro(reader, 'quasiquote');
+    case '~':
+      return read_macro(reader, 'unquote');
+    case '~@':
+      return read_macro(reader, 'splice');
     case '(':
       return read_list(reader);
     case '[':

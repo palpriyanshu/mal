@@ -33,6 +33,15 @@ class List extends MalValue {
   count() {
     return this.ast.length;
   }
+
+  prepend(arg) {
+    return new List([arg, ...this.ast]);
+  }
+
+  concat(lists) {
+    const flatList = lists.flatMap((list) => list.ast);
+    return new List(this.ast.concat(flatList));
+  }
 }
 
 class Vector extends MalValue {
@@ -51,6 +60,15 @@ class Vector extends MalValue {
 
   count() {
     return this.ast.length;
+  }
+
+  prepend(arg) {
+    return new List([arg, ...this.ast]);
+  }
+
+  concat(lists) {
+    const flatList = lists.flatMap((list) => list.ast);
+    return new List(this.ast.concat(flatList));
   }
 }
 

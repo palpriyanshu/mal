@@ -74,6 +74,15 @@ repl_env.set(new MalSymbol('swap!'), (atom, fn, ...fnArgs) =>
   atom.swap(fn, fnArgs)
 );
 
+repl_env.set(new MalSymbol('cons'), (arg1, list) => list.prepend(arg1));
+
+repl_env.set(new MalSymbol('concat'), (list1 = new List([]), ...lists) =>
+  list1.concat(lists)
+);
+repl_env.set(new MalSymbol('vec'), (list) => {
+  return new Vector(list.ast);
+});
+
 repl_env.set(
   new MalSymbol('*ARGV*'),
   new List(process.argv.slice(3).map((arg) => new Str(arg)))
