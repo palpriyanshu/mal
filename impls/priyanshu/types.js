@@ -18,6 +18,23 @@ class Sequence extends MalValue {
     this.ast = ast;
   }
 
+  isEmpty() {
+    return this.ast.length === 0;
+  }
+
+  count() {
+    return this.ast.length;
+  }
+
+  prepend(arg) {
+    return new List([arg, ...this.ast]);
+  }
+
+  concat(lists) {
+    const flatList = lists.flatMap((list) => list.ast);
+    return new List(this.ast.concat(...flatList));
+  }
+
   equal(other) {
     if (!(other instanceof Sequence)) {
       return false;
@@ -62,7 +79,7 @@ class List extends Sequence {
 
   concat(lists) {
     const flatList = lists.flatMap((list) => list.ast);
-    return new List(this.ast.concat(flatList));
+    return new List(this.ast.concat(...flatList));
   }
 }
 
@@ -90,7 +107,7 @@ class Vector extends Sequence {
 
   concat(lists) {
     const flatList = lists.flatMap((list) => list.ast);
-    return new List(this.ast.concat(flatList));
+    return new List(this.ast.concat(...flatList));
   }
 }
 

@@ -148,6 +148,9 @@ const read_macro = (reader, macro_name) => {
 
 const read_form = (reader) => {
   const token = reader.peek();
+  if (token === '~@') {
+    return read_macro(reader, 'splice-unquote');
+  }
 
   switch (token[0]) {
     case "'":
@@ -157,10 +160,7 @@ const read_form = (reader) => {
     case '~':
       return read_macro(reader, 'unquote');
     case '@':
-      reader.next();
-      return new List([new MalSymbol('deref'), new MalSymbol(reader.next())]);
-    case '~@':
-      return read_macro(reader, 'splice-unquote');
+      return read_macro(reader, 'deref');
     case '(':
       return read_list(reader);
     case '[':

@@ -88,7 +88,7 @@ const quasiquote = function (ast) {
       }
     }
 
-    return new List(new MalSymbol('vec'), result);
+    return new List([new MalSymbol('vec'), result]);
   }
 
   return ast;
@@ -127,7 +127,6 @@ const EVAL = (ast, repl_env) => {
       repl_env = newEnv;
       ast = ast.ast[2];
       continue;
-      // return EVAL(ast.ast[2], newEnv);
     }
 
     if (firstElement === 'do') {
@@ -142,10 +141,8 @@ const EVAL = (ast, repl_env) => {
       const exprs = EVAL(ast.ast[1], repl_env);
       if (exprs === Nil || exprs === false) {
         ast = ast.ast[3] || Nil;
-        // return ast.ast[3] !== undefined ? EVAL(ast.ast[3], repl_env) : Nil;
       } else {
         ast = ast.ast[2];
-        // return EVAL(ast.ast[2], repl_env);
       }
       continue;
     }
