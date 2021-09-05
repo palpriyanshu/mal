@@ -9,10 +9,6 @@ const pr_str = (val, print_readably = false) => {
     return val.pr_str(print_readably);
   }
 
-  if (val instanceof Function) {
-    return '#<function>';
-  }
-
   return val.toString();
 };
 
@@ -107,11 +103,12 @@ class HashMap extends MalValue {
   pr_str(print_readably = false) {
     let string = '';
     let separator = '';
+
     for (const [key, value] of this.hashMap.entries()) {
       string =
         string +
         separator +
-        pr_str(key, print_readably) +
+        pr_str(key[0] || key, print_readably) +
         ' ' +
         pr_str(value, print_readably);
       separator = ' ';
@@ -306,10 +303,10 @@ class NilValue extends MalValue {
   }
 
   equal(other) {
-    if (!(other instanceof Sequence)) {
+    if (!(other instanceof NilValue)) {
       return false;
     }
-    return false;
+    return true;
   }
 }
 

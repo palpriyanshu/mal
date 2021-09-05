@@ -143,7 +143,7 @@ const tokenize = (str) => {
 
 const read_macro = (reader, macro_name) => {
   reader.next();
-  return new List([new MalSymbol(macro_name), new MalSymbol(reader.next())]);
+  return new List([new MalSymbol(macro_name), read_form(reader)]);
 };
 
 const read_form = (reader) => {
@@ -156,8 +156,11 @@ const read_form = (reader) => {
       return read_macro(reader, 'quasiquote');
     case '~':
       return read_macro(reader, 'unquote');
+    case '@':
+      reader.next();
+      return new List([new MalSymbol('deref'), new MalSymbol(reader.next())]);
     case '~@':
-      return read_macro(reader, 'splice');
+      return read_macro(reader, 'splice-unquote');
     case '(':
       return read_list(reader);
     case '[':

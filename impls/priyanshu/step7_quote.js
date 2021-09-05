@@ -2,7 +2,15 @@ const readline = require('readline');
 
 const {read_str} = require('./reader');
 const {pr_str} = require('./printer');
-const {List, MalSymbol, Vector, HashMap, Nil, FN} = require('./types');
+const {
+  List,
+  MalSymbol,
+  Vector,
+  HashMap,
+  Nil,
+  FN,
+  MalValue,
+} = require('./types');
 const {Env} = require('./env');
 const {repl_env} = require('./core');
 
@@ -39,6 +47,10 @@ const eval_ast = (ast, repl_env) => {
 };
 
 const quasiquote = function (ast) {
+  if (ast instanceof HashMap || ast instanceof MalSymbol) {
+    return new List([new MalSymbol('quote'), ast]);
+  }
+
   if (ast instanceof List) {
     if (ast.ast[0] && ast.ast[0].symbol === 'unquote') {
       return ast.ast[1];
@@ -61,8 +73,22 @@ const quasiquote = function (ast) {
     return result;
   }
 
-  if (ast instanceof HashMap || ast instanceof MalSymbol) {
-    return new List([new MalSymbol('quote'), ast]);
+  if (ast instanceof Vector) {
+    let result = new List([]);
+    for (let i = ast.ast.length - 1; i >= 0; i--) {
+      const elt = ast.ast[i];
+      if (
+        elt instanceof List &&
+        elt.ast[0] &&
+        elt.ast[0].symbol === 'splice-unquote'
+      ) {
+        result = new List([new MalSymbol('concat'), elt.ast[1], result]);
+      } else {
+        result = new List([new MalSymbol('cons'), quasiquote(elt), result]);
+      }
+    }
+
+    return new List(new MalSymbol('vec'), result);
   }
 
   return ast;
