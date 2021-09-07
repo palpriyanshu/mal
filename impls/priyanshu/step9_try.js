@@ -233,6 +233,51 @@ rep(
 
 rep('(def! true? (fn* [x] (if x true false)))');
 rep('(def! false? (fn* [x] (if x false true)))');
+rep('(def! push (fn* [seq, ele] (concat seq (list ele)) ))');
+rep(`
+(def! reduce
+        (fn* [fn seq ctx]
+          (if (= (count seq) 0)
+            ctx
+            (reduce fn (rest seq ) (fn (first seq) ctx)))))`);
+
+rep(`
+    (def! map
+      (fn* [fn seq] (
+        reduce
+          (fn* [ele ctx] (push ctx (fn ele)))
+          seq
+          (list)
+        )
+      )
+    )`);
+
+rep(`
+(def! filter
+  (fn* [fn seq] (
+    reduce
+      (fn* [ele ctx]
+        (if (fn ele) (push ctx ele) ctx )
+        )
+      seq
+      (list)
+    )
+  )
+)`);
+
+rep(`
+(def! every?
+  (fn* [fn seq]
+    (true? (= (count seq) (count (filter fn seq))))))`);
+
+rep(`
+(def! some?
+  (fn* [fn seq]
+    (true? (> (count (filter fn seq)) 0))))`);
+
+rep(
+  '(defmacro! defn! (fn* [fn_name, args, fn_body] `(def! ~fn_name (fn* ~args ~fn_body))))'
+);
 
 const main = () => {
   if (process.argv.length > 2) {
