@@ -4,11 +4,10 @@ class MalValue {
   }
 }
 
-const pr_str = (val, print_readably = false) => {
+const pr_str = (val = Nil, print_readably = false) => {
   if (val instanceof MalValue) {
     return val.pr_str(print_readably);
   }
-
   return val.toString();
 };
 
@@ -35,14 +34,36 @@ class Sequence extends MalValue {
     return new List(this.ast.concat(...flatList));
   }
 
+  nth(index) {
+    if (index >= this.ast.length) {
+      throw new Exceptions('index out of range');
+    }
+    return this.ast[index];
+  }
+
+  first() {
+    if (this.isEmpty() || this.ast[0] === Nil) {
+      return Nil;
+    }
+
+    return this.ast[0];
+  }
+
+  rest() {
+    if (this.isEmpty() || this.ast[0] === Nil) {
+      return new List([]);
+    }
+    return new List(this.ast.slice(1));
+  }
+
   equal(other) {
     if (!(other instanceof Sequence)) {
       return false;
     }
 
     other.ast.forEach((ele, index) => {
-      if (element instanceof MalValue) {
-        return element.equal(this.ast[index]);
+      if (ele instanceof MalValue) {
+        return ele.equal(this.ast[index]);
       }
       return ele === this.ast[index];
     });
@@ -51,7 +72,7 @@ class Sequence extends MalValue {
       return true;
     }
 
-    return false;
+    return true;
   }
 }
 
@@ -243,12 +264,13 @@ class MalSymbol extends MalValue {
 }
 
 class FN extends MalValue {
-  constructor(binds, fnBody, env, fn) {
+  constructor(binds, fnBody, env, fn, is_macro = false) {
     super();
     this.binds = binds;
     this.fnBody = fnBody;
     this.env = env;
     this.fn = fn;
+    this.is_macro = is_macro;
   }
 
   pr_str(print_readably = false) {
@@ -257,6 +279,15 @@ class FN extends MalValue {
 
   apply(args) {
     return this.fn.apply(null, args);
+  }
+
+  isMacro() {
+    return this.is_macro;
+  }
+
+  setMacro(isTrue) {
+    this.is_macro = isTrue;
+    return this.is_macro;
   }
 
   equal(other) {
@@ -342,5 +373,6 @@ module.exports = {
   FN,
   Nil,
   Atom,
+  Sequence,
   pr_str,
 };

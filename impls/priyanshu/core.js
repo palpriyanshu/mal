@@ -8,6 +8,7 @@ const {
   Str,
   Atom,
   FN,
+  Sequence,
 } = require('./types');
 const {Env} = require('./env');
 const {pr_str} = require('./printer');
@@ -60,7 +61,12 @@ repl_env.set(new MalSymbol('str'), (...val) => {
 });
 
 repl_env.set(new MalSymbol('list'), (...args) => new List([...args]));
-repl_env.set(new MalSymbol('count'), (list) => list.count());
+repl_env.set(new MalSymbol('count'), (list) => {
+  if (list instanceof Sequence) {
+    return list.count();
+  }
+  return 0;
+});
 repl_env.set(new MalSymbol('list?'), (arg) => arg instanceof List);
 
 repl_env.set(new MalSymbol('read-string'), (str) => read_str(str.string));
@@ -86,6 +92,23 @@ repl_env.set(new MalSymbol('concat'), (list1 = new List([]), ...lists) =>
 );
 repl_env.set(new MalSymbol('vec'), (list) => {
   return new Vector(list.ast);
+});
+repl_env.set(new MalSymbol('nth'), (seq, index) => {
+  return seq.nth(index);
+});
+
+repl_env.set(new MalSymbol('first'), (seq) => {
+  if (seq instanceof Sequence) {
+    return seq.first();
+  }
+  return Nil;
+});
+
+repl_env.set(new MalSymbol('rest'), (seq) => {
+  if (seq instanceof Sequence) {
+    return seq.rest();
+  }
+  return new List([]);
 });
 
 repl_env.set(
