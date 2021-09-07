@@ -9,6 +9,7 @@ const {
   Atom,
   FN,
   Sequence,
+  Keyword,
 } = require('./types');
 const {Env} = require('./env');
 const {pr_str} = require('./printer');
@@ -117,6 +118,72 @@ repl_env.set(new MalSymbol('nil?'), (val) => {
 
 repl_env.set(new MalSymbol('symbol?'), (val) => {
   return seq instanceof MalSymbol;
+});
+
+repl_env.set(new MalSymbol('symbol'), (str) => {
+  return new MalSymbol(str);
+});
+
+repl_env.set(new MalSymbol('keyword'), (str) => {
+  if (str instanceof Keyword) {
+    return str;
+  }
+  return new Keyword(str);
+});
+
+repl_env.set(new MalSymbol('keyword?'), (str) => {
+  return str instanceof Keyword;
+});
+
+repl_env.set(new MalSymbol('vector'), (...args) => {
+  return new Vector([...args]);
+});
+
+repl_env.set(new MalSymbol('vector?'), (str) => {
+  return str instanceof Vector;
+});
+
+repl_env.set(new MalSymbol('sequential?'), (str) => {
+  return str instanceof Sequence;
+});
+
+repl_env.set(new MalSymbol('hash-map'), (...args) => {
+  if (args.length % 2 === 0) {
+    const map = new Map();
+    for (let index = 0; index < args.length; index += 2) {
+      map.set(args[index], args[index + 1]);
+    }
+    return new HashMap(map);
+  }
+  throw 'Key-value pair must be even';
+});
+
+repl_env.set(new MalSymbol('map?'), (str) => {
+  return str instanceof HashMap;
+});
+
+repl_env.set(new MalSymbol('assoc'), (hashmap, ...key_val_pair) => {
+  return hashmap.add(...key_val_pair);
+});
+
+repl_env.set(new MalSymbol('dissoc'), (hashmap, ...keys) => {
+  return hashmap.remove(...keys);
+});
+
+repl_env.set(new MalSymbol('contains?'), (hashmap, key) => {
+  return hashmap.contains(key);
+});
+
+repl_env.set(new MalSymbol('get'), (hashmap, key) => {
+  return hashmap.get(key);
+});
+
+repl_env.set(new MalSymbol('keys'), (hashmap) => {
+  return hashmap.keys();
+});
+
+repl_env.set(new MalSymbol('vals'), (hashmap) => {
+  return hashmap.values();
 });
 
 repl_env.set(

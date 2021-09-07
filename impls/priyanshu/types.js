@@ -154,12 +154,71 @@ class HashMap extends MalValue {
     return '{' + string + '}';
   }
 
+  add(...pairs) {
+    const map = new Map();
+    for (let index = 0; index < pairs.length; index += 2) {
+      map.set(pairs[index], pairs[index + 1]);
+    }
+    return new HashMap(new Map([...map, ...this.hashMap]));
+  }
+
+  remove(...otherKeys) {
+    const originalKeys = [...this.hashMap.keys()];
+    const filteredKeys = originalKeys.filter((key) =>
+      otherKeys.some((k) => !key.equal(k))
+    );
+
+    const map = new Map();
+
+    filteredKeys.forEach((key) => {
+      map.set(key, this.hashMap.get(key));
+    });
+
+    return new HashMap(map);
+  }
+
+  contains(otherKey) {
+    for (const [key] of this.hashMap.entries()) {
+      if (key instanceof MalValue && key.equal(otherKey)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  get(otherKey) {
+    for (const [key, value] of this.hashMap.entries()) {
+      if (key instanceof MalValue && key.equal(otherKey)) {
+        return value;
+      }
+    }
+
+    return Nil;
+  }
+
+  keys() {
+    const list = [];
+    for (const [key, value] of this.hashMap.entries()) {
+      list.push(key);
+    }
+
+    return new List(list);
+  }
+
+  values() {
+    const list = [];
+    for (const [key, value] of this.hashMap.entries()) {
+      list.push(value);
+    }
+
+    return new List(list);
+  }
+
   equal(other) {
     if (!(other instanceof HashMap)) {
       return false;
     }
-
-    return this.hashMap === other.hashMap;
+    return this.hashMap.equal(other.hashMap);
   }
 }
 
