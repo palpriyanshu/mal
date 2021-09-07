@@ -111,6 +111,14 @@ repl_env.set(new MalSymbol('rest'), (seq) => {
   return new List([]);
 });
 
+repl_env.set(new MalSymbol('nil?'), (val) => {
+  return val === Nil;
+});
+
+repl_env.set(new MalSymbol('symbol?'), (val) => {
+  return seq instanceof MalSymbol;
+});
+
 repl_env.set(
   new MalSymbol('*ARGV*'),
   new List(process.argv.slice(3).map((arg) => new Str(arg)))
