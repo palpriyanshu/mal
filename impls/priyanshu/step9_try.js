@@ -232,7 +232,7 @@ rep(
 );
 
 rep('(def! true? (fn* [x] (if x true false)))');
-rep('(def! false? (fn* [x] (if x false true)))');
+rep('(def! false? not)');
 rep('(def! push (fn* [seq, ele] (concat seq (list ele)) ))');
 rep(`
 (def! reduce
@@ -267,13 +267,19 @@ rep(`
 
 rep(`
 (def! every?
-  (fn* [fn seq]
-    (true? (= (count seq) (count (filter fn seq))))))`);
+  (fn* [fn seq] 
+    (if (not (fn (first seq)))
+    false
+    (if (= (count seq) 1) true (every? fn (rest seq))) )
+    ))`);
 
 rep(`
 (def! some?
-  (fn* [fn seq]
-    (true? (> (count (filter fn seq)) 0))))`);
+  (fn* [fn seq] 
+    (if (fn (first seq)) 
+    true
+    (if (= (count seq) 1) false (some? fn (rest seq))) )
+    ))`);
 
 rep(
   '(defmacro! defn! (fn* [fn_name, args, fn_body] `(def! ~fn_name (fn* ~args ~fn_body))))'

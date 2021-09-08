@@ -4,6 +4,14 @@ class MalValue {
   }
 }
 
+const isEqual = (first, second) => {
+  if (first instanceof MalValue) {
+    return first.equal(second);
+  }
+
+  return first === second;
+};
+
 const pr_str = (val = Nil, print_readably = false) => {
   if (val instanceof MalValue) {
     return val.pr_str(print_readably);
@@ -57,7 +65,7 @@ class Sequence extends MalValue {
   }
 
   equal(other) {
-    if (!(other instanceof Sequence)) {
+    if (!(other instanceof Sequence) || this.count !== other.count) {
       return false;
     }
 
@@ -85,23 +93,6 @@ class List extends Sequence {
   pr_str(print_readably = false) {
     return '(' + this.ast.map((e) => pr_str(e, print_readably)).join(' ') + ')';
   }
-
-  isEmpty() {
-    return this.ast.length === 0;
-  }
-
-  count() {
-    return this.ast.length;
-  }
-
-  prepend(arg) {
-    return new List([arg, ...this.ast]);
-  }
-
-  concat(lists) {
-    const flatList = lists.flatMap((list) => list.ast);
-    return new List(this.ast.concat(...flatList));
-  }
 }
 
 class Vector extends Sequence {
@@ -110,25 +101,8 @@ class Vector extends Sequence {
     this.ast = ast;
   }
 
-  isEmpty() {
-    return this.ast.length === 0;
-  }
-
   pr_str(print_readably = false) {
     return '[' + this.ast.map((e) => pr_str(e, print_readably)).join(' ') + ']';
-  }
-
-  count() {
-    return this.ast.length;
-  }
-
-  prepend(arg) {
-    return new List([arg, ...this.ast]);
-  }
-
-  concat(lists) {
-    const flatList = lists.flatMap((list) => list.ast);
-    return new List(this.ast.concat(...flatList));
   }
 }
 
@@ -154,6 +128,16 @@ class HashMap extends MalValue {
     return '{' + string + '}';
   }
 
+  get(otherKey) {
+    for (const [key, value] of this.hashMap.entries()) {
+      if (key instanceof MalValue && key.equal(otherKey)) {
+        return value;
+      }
+    }
+
+    return Nil;
+  }
+
   add(...pairs) {
     const map = new Map();
     for (let index = 0; index < pairs.length; index += 2) {
@@ -164,14 +148,14 @@ class HashMap extends MalValue {
 
   remove(...otherKeys) {
     const originalKeys = [...this.hashMap.keys()];
-    const filteredKeys = originalKeys.filter((key) =>
-      otherKeys.some((k) => !key.equal(k))
+    const filteredKeys = originalKeys.filter(
+      (key) => !otherKeys.some((k) => k.equal(key))
     );
 
     const map = new Map();
 
     filteredKeys.forEach((key) => {
-      map.set(key, this.hashMap.get(key));
+      map.set(key, this.get(key));
     });
 
     return new HashMap(map);
@@ -184,16 +168,6 @@ class HashMap extends MalValue {
       }
     }
     return false;
-  }
-
-  get(otherKey) {
-    for (const [key, value] of this.hashMap.entries()) {
-      if (key instanceof MalValue && key.equal(otherKey)) {
-        return value;
-      }
-    }
-
-    return Nil;
   }
 
   keys() {
@@ -218,7 +192,15 @@ class HashMap extends MalValue {
     if (!(other instanceof HashMap)) {
       return false;
     }
-    return this.hashMap.equal(other.hashMap);
+
+    for (const [key, value] of this.hashMap.entries()) {
+      const otherValue = other.get(key);
+      if (!isEqual(otherValue, value)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
 

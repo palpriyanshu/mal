@@ -61,6 +61,10 @@ repl_env.set(new MalSymbol('str'), (...val) => {
   return new Str(val.map((x) => pr_str(x, false)).join(''));
 });
 
+repl_env.set(new MalSymbol('pr-str'), (...val) => {
+  return new Str(val.map((x) => pr_str(x, true)).join(' '));
+});
+
 repl_env.set(new MalSymbol('list'), (...args) => new List([...args]));
 repl_env.set(new MalSymbol('count'), (list) => {
   if (list instanceof Sequence) {
@@ -117,18 +121,21 @@ repl_env.set(new MalSymbol('nil?'), (val) => {
 });
 
 repl_env.set(new MalSymbol('symbol?'), (val) => {
-  return seq instanceof MalSymbol;
+  return val instanceof MalSymbol;
 });
 
 repl_env.set(new MalSymbol('symbol'), (str) => {
-  return new MalSymbol(str);
+  if (str instanceof MalSymbol) {
+    return str;
+  }
+  return new MalSymbol(str.string);
 });
 
 repl_env.set(new MalSymbol('keyword'), (str) => {
   if (str instanceof Keyword) {
     return str;
   }
-  return new Keyword(str);
+  return new Keyword(str.string);
 });
 
 repl_env.set(new MalSymbol('keyword?'), (str) => {
@@ -175,7 +182,10 @@ repl_env.set(new MalSymbol('contains?'), (hashmap, key) => {
 });
 
 repl_env.set(new MalSymbol('get'), (hashmap, key) => {
-  return hashmap.get(key);
+  if (hashmap instanceof HashMap) {
+    return hashmap.get(key);
+  }
+  return Nil;
 });
 
 repl_env.set(new MalSymbol('keys'), (hashmap) => {
