@@ -288,7 +288,7 @@ rep(`
   (fn* [& args]
     (list \'if (first args)
       (first args)
-      (if (= (count args) 1)
+      (list \'if (= (count args) 1)
         (first args) 
         (cons \'or (rest args))
       )
@@ -301,7 +301,7 @@ rep(`
 (defmacro! and
   (fn* [& args]
     (list \'if (first args)
-      (if (= (count args) 1)
+      (list \'if (= (count args) 1)
         (first args) 
         (cons \'and (rest args))
       )
@@ -312,6 +312,57 @@ rep(`
 
 rep(
   '(defmacro! defn! (fn* [fn_name, args, fn_body] `(def! ~fn_name (fn* ~args ~fn_body))))'
+);
+
+rep(
+  `(defmacro! condp
+              (fn* [predicate expr & clauses]
+                (if (> (count clauses) 0)
+                  (list \'if (list \'predicate (first clauses) expr)
+                    (if (> (count clauses) 1)
+                      (nth clauses 1)
+                      (throw "odd number of forms to condp"))
+                    (cons \'condp (cons predicate (cons expr (rest (rest clauses)))))
+                  )
+                )
+              )
+  )`
+);
+
+rep(
+  `(defmacro! ->> (fn* [& seq]
+                   (if (> (count seq) 0)
+                      (if (= (count seq) 1)
+                        (first seq)
+                        (concat
+                          (list '->> (push (first (rest seq)) (first seq)) )
+                          (rest (rest seq))
+                        ) 
+                      )
+                    )
+                  )
+  )`
+);
+
+rep(
+  `(defmacro! -> (fn* [& seq]
+                   (if (> (count seq) 0)
+                      (if (= (count seq) 1)
+                        (first seq)
+                        (concat
+                          (list
+                            '->
+                            (concat
+                              (list (first (first (rest seq))) (first seq))
+                              (rest (first (rest seq)))
+                            )
+                          )
+                          (rest (rest seq))
+                        )
+                      )
+                    )
+                  )
+  )`
 );
 
 const main = () => {

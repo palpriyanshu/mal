@@ -92,9 +92,9 @@ repl_env.set(new MalSymbol('swap!'), (atom, fn, ...fnArgs) =>
 
 repl_env.set(new MalSymbol('cons'), (arg1, list) => list.prepend(arg1));
 
-repl_env.set(new MalSymbol('concat'), (list1 = new List([]), ...lists) =>
-  list1.concat(lists)
-);
+repl_env.set(new MalSymbol('concat'), (list1 = new List([]), ...lists) => {
+  return list1.concat(lists);
+});
 repl_env.set(new MalSymbol('vec'), (list) => {
   return new Vector(list.ast);
 });
