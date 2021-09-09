@@ -188,7 +188,7 @@ const EVAL = (ast, repl_env) => {
     }
 
     if (firstElement === 'macroexpand') {
-      return macroexpand(ast.ast[1], repl_env);
+      return macroexpand(EVAL(ast.ast[1], repl_env), repl_env);
     }
 
     if (firstElement === 'fn*') {
@@ -210,6 +210,8 @@ const EVAL = (ast, repl_env) => {
     if (fn instanceof Function) {
       return fn.apply(null, args);
     }
+
+    console.log(fn, 'fn', typeof fn);
     throw `${fn} is not a function`;
   }
 };
@@ -280,6 +282,33 @@ rep(`
     true
     (if (= (count seq) 1) false (some? fn (rest seq))) )
     ))`);
+
+rep(`
+(defmacro! or
+  (fn* [& args]
+    (list \'if (first args)
+      (first args)
+      (if (= (count args) 1)
+        (first args) 
+        (cons \'or (rest args))
+      )
+    )
+    )
+  )
+)`);
+
+rep(`
+(defmacro! and
+  (fn* [& args]
+    (list \'if (first args)
+      (if (= (count args) 1)
+        (first args) 
+        (cons \'and (rest args))
+      )
+      (first args)
+    )
+  )
+)`);
 
 rep(
   '(defmacro! defn! (fn* [fn_name, args, fn_body] `(def! ~fn_name (fn* ~args ~fn_body))))'
